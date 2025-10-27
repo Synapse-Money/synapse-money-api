@@ -6,15 +6,22 @@ import io.jsonwebtoken.security.SignatureException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
+@ExtendWith(MockitoExtension.class)
 @DisplayName("JwtService Tests")
 class JwtServiceTest {
 
@@ -43,6 +50,23 @@ class JwtServiceTest {
         assertThat(token).isNotNull();
         assertThat(token).isNotEmpty();
         assertThat(token.split("\\.")).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("Should generate token with extra claims")
+    void shouldGenerateTokenWithExtraClaims() {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", "ADMIN");
+        extraClaims.put("userId", 123L);
+
+        String token = jwtService.generateToken(extraClaims, userDetails);
+
+        assertThat(token).isNotNull();
+        assertThat(token).isNotEmpty();
+        assertThat(token.split("\\.")).hasSize(3);
+
+        String username = jwtService.extractUsername(token);
+        assertThat(username).isEqualTo("john.doe@example.com");
     }
 
     @Test
@@ -93,8 +117,8 @@ class JwtServiceTest {
     }
 
     @Test
-    @DisplayName("Should detect expired token")
-    void shouldDetectExpiredToken() {
+    @DisplayName("Should return false for expired token")
+    void shouldReturnFalseForExpiredToken() {
         JwtService shortExpirationService = new JwtService(
                 "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970",
                 1L
@@ -108,28 +132,22 @@ class JwtServiceTest {
             Thread.currentThread().interrupt();
         }
 
-        assertThatThrownBy(() -> shortExpirationService.isTokenValid(token, userDetails))
-                .isInstanceOf(ExpiredJwtException.class);
+        boolean isValid = shortExpirationService.isTokenValid(token, userDetails);
+
+        assertThat(isValid).isFalse();
     }
 
     @Test
-    @DisplayName("Should throw exception when validating expired token")
-    void shouldThrowExceptionWhenValidatingExpiredToken() {
-        JwtService shortExpirationService = new JwtService(
-                "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970",
-                1L
-        );
+    @DisplayName("Should return false when username matches but token is expired")
+    void shouldReturnFalseWhenUsernameMatchesButTokenIsExpired() {
+        String token = jwtService.generateToken(userDetails);
 
-        String token = shortExpirationService.generateToken(userDetails);
+        JwtService spyService = spy(jwtService);
+        doReturn(true).when(spyService).isTokenExpired(token);
 
-        try {
-            Thread.sleep(10);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        boolean isValid = spyService.isTokenValid(token, userDetails);
 
-        assertThatThrownBy(() -> shortExpirationService.isTokenValid(token, userDetails))
-                .isInstanceOf(ExpiredJwtException.class);
+        assertThat(isValid).isFalse();
     }
 
     @Test
@@ -184,5 +202,25 @@ class JwtServiceTest {
         boolean isExpired = jwtService.isTokenExpired(token);
 
         assertThat(isExpired).isFalse();
+    }
+
+    @Test
+    @DisplayName("Should check if token is expired for expired token")
+    void shouldCheckIfTokenIsExpiredForExpiredToken() {
+        JwtService shortExpirationService = new JwtService(
+                "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970",
+                1L
+        );
+
+        String token = shortExpirationService.generateToken(userDetails);
+
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        assertThatThrownBy(() -> shortExpirationService.isTokenExpired(token))
+                .isInstanceOf(ExpiredJwtException.class);
     }
 }
