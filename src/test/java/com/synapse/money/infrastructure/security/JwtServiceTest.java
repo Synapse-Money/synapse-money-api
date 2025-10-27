@@ -42,7 +42,7 @@ class JwtServiceTest {
 
         assertThat(token).isNotNull();
         assertThat(token).isNotEmpty();
-        assertThat(token.split("\.")).hasSize(3);
+        assertThat(token.split("\\.")).hasSize(3);
     }
 
     @Test
@@ -113,6 +113,26 @@ class JwtServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw exception when validating expired token")
+    void shouldThrowExceptionWhenValidatingExpiredToken() {
+        JwtService shortExpirationService = new JwtService(
+                "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970",
+                1L
+        );
+
+        String token = shortExpirationService.generateToken(userDetails);
+
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        assertThatThrownBy(() -> shortExpirationService.isTokenValid(token, userDetails))
+                .isInstanceOf(ExpiredJwtException.class);
+    }
+
+    @Test
     @DisplayName("Should throw exception for malformed token")
     void shouldThrowExceptionForMalformedToken() {
         String malformedToken = "invalid.token.here";
@@ -127,7 +147,7 @@ class JwtServiceTest {
         String token = jwtService.generateToken(userDetails);
 
         JwtService differentSecretService = new JwtService(
-                "differentSecretKey123456789012345678901234567890123456789012",
+                "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437",
                 86400000L
         );
 
