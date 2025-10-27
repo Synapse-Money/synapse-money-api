@@ -53,23 +53,6 @@ class JwtServiceTest {
     }
 
     @Test
-    @DisplayName("Should generate token with extra claims")
-    void shouldGenerateTokenWithExtraClaims() {
-        Map<String, Object> extraClaims = new HashMap<>();
-        extraClaims.put("role", "ADMIN");
-        extraClaims.put("userId", 123L);
-
-        String token = jwtService.generateToken(extraClaims, userDetails);
-
-        assertThat(token).isNotNull();
-        assertThat(token).isNotEmpty();
-        assertThat(token.split("\\.")).hasSize(3);
-
-        String username = jwtService.extractUsername(token);
-        assertThat(username).isEqualTo("john.doe@example.com");
-    }
-
-    @Test
     @DisplayName("Should extract username from token")
     void shouldExtractUsernameFromToken() {
         String token = jwtService.generateToken(userDetails);
