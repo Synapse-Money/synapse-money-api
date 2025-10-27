@@ -59,6 +59,16 @@ class UserTest {
     }
 
     @Test
+    @DisplayName("Should return null when normalizing null email")
+    void shouldReturnNullWhenNormalizingNullEmail() {
+        User user = User.builder().build();
+
+        String normalizedEmail = user.getNormalizedEmail();
+
+        assertThat(normalizedEmail).isNull();
+    }
+
+    @Test
     @DisplayName("Should validate email format")
     void shouldValidateEmailFormat() {
         assertThat(User.isValidEmail("test@example.com")).isTrue();
