@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.synapse.money.application.dto.request.LoginRequest;
 import com.synapse.money.application.dto.request.RegisterRequest;
 import com.synapse.money.application.dto.response.AuthResponse;
+import com.synapse.money.application.dto.response.UserResponse;
 import com.synapse.money.application.usecase.LoginUseCase;
 import com.synapse.money.application.usecase.RegisterUseCase;
 import com.synapse.money.domain.exception.EmailAlreadyExistsException;
 import com.synapse.money.domain.exception.InvalidCredentialsException;
+import com.synapse.money.infrastructure.security.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -35,25 +39,33 @@ class AuthControllerTest {
     private static final String VALID_PASSWORD = "SecurePass123!";
     private static final String WRONG_PASSWORD = "WrongPassword";
     private static final String VALID_JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-    private static final String TOKEN_TYPE = "Bearer";
-    private static final Long TOKEN_EXPIRATION = 3600L;
+    private static final String INVALID_CREDENTIALS_MESSAGE = "Invalid email or password";
+    private static final Long USER_ID = 1L;
     private static final String EMPTY_STRING = "";
     private static final String INVALID_EMAIL = "invalid-email";
     private static final String SHORT_PASSWORD = "123";
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
 
     @MockitoBean
     private RegisterUseCase registerUseCase;
 
     @MockitoBean
     private LoginUseCase loginUseCase;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @Autowired
+    AuthControllerTest(
+            MockMvc mockMvc,
+            ObjectMapper objectMapper) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+    }
 
     @Test
     @DisplayName("POST /api/v1/auth/register - Should register user successfully")
@@ -65,12 +77,18 @@ class AuthControllerTest {
                 VALID_PASSWORD
         );
 
-        AuthResponse successfulAuthResponse = new AuthResponse(
-                VALID_JWT_TOKEN,
-                TOKEN_TYPE,
-                TOKEN_EXPIRATION,
-                null
-        );
+        UserResponse userResponse = UserResponse.builder()
+                .id(USER_ID)
+                .firstName(VALID_FIRST_NAME)
+                .lastName(VALID_LAST_NAME)
+                .email(VALID_EMAIL)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        AuthResponse successfulAuthResponse = AuthResponse.builder()
+                .token(VALID_JWT_TOKEN)
+                .user(userResponse)
+                .build();
 
         when(registerUseCase.execute(any(RegisterRequest.class))).thenReturn(successfulAuthResponse);
 
@@ -79,8 +97,8 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(validRegisterRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value(VALID_JWT_TOKEN))
-                .andExpect(jsonPath("$.type").value(TOKEN_TYPE))
-                .andExpect(jsonPath("$.expiresIn").value(TOKEN_EXPIRATION));
+                .andExpect(jsonPath("$.user.id").value(USER_ID))
+                .andExpect(jsonPath("$.user.email").value(VALID_EMAIL));
     }
 
     @Test
@@ -127,12 +145,18 @@ class AuthControllerTest {
                 VALID_PASSWORD
         );
 
-        AuthResponse successfulAuthResponse = new AuthResponse(
-                VALID_JWT_TOKEN,
-                TOKEN_TYPE,
-                TOKEN_EXPIRATION,
-                null
-        );
+        UserResponse userResponse = UserResponse.builder()
+                .id(USER_ID)
+                .firstName(VALID_FIRST_NAME)
+                .lastName(VALID_LAST_NAME)
+                .email(VALID_EMAIL)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        AuthResponse successfulAuthResponse = AuthResponse.builder()
+                .token(VALID_JWT_TOKEN)
+                .user(userResponse)
+                .build();
 
         when(loginUseCase.execute(any(LoginRequest.class))).thenReturn(successfulAuthResponse);
 
@@ -141,8 +165,8 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(validLoginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value(VALID_JWT_TOKEN))
-                .andExpect(jsonPath("$.type").value(TOKEN_TYPE))
-                .andExpect(jsonPath("$.expiresIn").value(TOKEN_EXPIRATION));
+                .andExpect(jsonPath("$.user.id").value(USER_ID))
+                .andExpect(jsonPath("$.user.email").value(VALID_EMAIL));
     }
 
     @Test
@@ -154,7 +178,7 @@ class AuthControllerTest {
         );
 
         when(loginUseCase.execute(any(LoginRequest.class)))
-                .thenThrow(new InvalidCredentialsException());
+                .thenThrow(new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE));
 
         mockMvc.perform(post(LOGIN_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
