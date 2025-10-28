@@ -74,7 +74,6 @@ class LoginUseCaseTest {
                 .lastName("Doe")
                 .email("john.doe@example.com")
                 .createdAt(existingUser.getCreatedAt())
-                .updatedAt(existingUser.getUpdatedAt())
                 .build();
     }
 
