@@ -123,14 +123,23 @@ class BCryptPasswordHasherTest {
     }
 
     @Test
-    @DisplayName("Should handle long passwords")
-    void shouldHandleLongPasswords() {
-        String rawPassword    = "a".repeat(100);
+    @DisplayName("Should handle passwords up to 72 bytes")
+    void shouldHandlePasswordsUpTo72Bytes() {
+        String rawPassword    = "a".repeat(72);
         String hashedPassword = passwordHasher.hash(rawPassword);
 
         boolean matches = passwordHasher.matches(rawPassword, hashedPassword);
 
         assertThat(matches).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should throw exception for passwords longer than 72 bytes")
+    void shouldThrowExceptionForPasswordsLongerThan72Bytes() {
+        String rawPassword = "a".repeat(73);
+
+        assertThatThrownBy(() -> passwordHasher.hash(rawPassword))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
