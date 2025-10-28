@@ -11,17 +11,17 @@ class InvalidCredentialsExceptionTest {
     @Test
     @DisplayName("Should create exception with default message")
     void shouldCreateExceptionWithDefaultMessage() {
-        InvalidCredentialsException exception = new InvalidCredentialsException();
+        InvalidCredentialsException exception = new InvalidCredentialsException("Invalid credentials");
 
         assertThat(exception).isNotNull();
-        assertThat(exception.getMessage()).isEqualTo("Invalid email or password");
+        assertThat(exception.getMessage()).isEqualTo("Invalid credentials");
         assertThat(exception).isInstanceOf(DomainException.class);
     }
 
     @Test
     @DisplayName("Should be a runtime exception")
     void shouldBeRuntimeException() {
-        InvalidCredentialsException exception = new InvalidCredentialsException();
+        InvalidCredentialsException exception = new InvalidCredentialsException("Invalid credentials");
 
         assertThat(exception).isInstanceOf(RuntimeException.class);
     }
