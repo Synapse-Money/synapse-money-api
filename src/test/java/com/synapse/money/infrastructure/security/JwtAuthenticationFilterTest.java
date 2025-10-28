@@ -63,7 +63,7 @@ class JwtAuthenticationFilterTest {
     @Test
     @DisplayName("Should authenticate user with valid JWT token")
     void shouldAuthenticateUserWithValidJwtToken() throws ServletException, IOException {
-        String token      = "valid.jwt.token";
+        String token = "valid.jwt.token";
         String authHeader = "Bearer " + token;
 
         when(request.getHeader("Authorization")).thenReturn(authHeader);
@@ -106,9 +106,26 @@ class JwtAuthenticationFilterTest {
     }
 
     @Test
+    @DisplayName("Should not authenticate when username cannot be extracted from token")
+    void shouldNotAuthenticateWhenUsernameCannotBeExtracted() throws ServletException, IOException {
+        String token = "invalid.jwt.token";
+        String authHeader = "Bearer " + token;
+
+        when(request.getHeader("Authorization")).thenReturn(authHeader);
+        when(jwtService.extractUsername(token)).thenReturn(null);
+
+        jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
+
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+
+        verify(filterChain).doFilter(request, response);
+        verify(userDetailsService, never()).loadUserByUsername(any());
+    }
+
+    @Test
     @DisplayName("Should not authenticate when token is invalid")
     void shouldNotAuthenticateWhenTokenIsInvalid() throws ServletException, IOException {
-        String token      = "invalid.jwt.token";
+        String token = "invalid.jwt.token";
         String authHeader = "Bearer " + token;
 
         when(request.getHeader("Authorization")).thenReturn(authHeader);
@@ -126,7 +143,7 @@ class JwtAuthenticationFilterTest {
     @Test
     @DisplayName("Should not authenticate when user is already authenticated")
     void shouldNotAuthenticateWhenUserIsAlreadyAuthenticated() throws ServletException, IOException {
-        String token      = "valid.jwt.token";
+        String token = "valid.jwt.token";
         String authHeader = "Bearer " + token;
 
         SecurityContextHolder.getContext().setAuthentication(
