@@ -76,11 +76,23 @@ class RegisterUseCaseTest {
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
 
+        when(userResponseMapper.toResponse(any(User.class))).thenReturn(
+                com.synapse.money.application.dto.response.UserResponse.builder()
+                        .id(1L)
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("john.doe@example.com")
+                        .createdAt(savedUser.getCreatedAt())
+                        .build()
+        );
+
         AuthResponse response = registerUseCase.execute(validRequest);
 
         assertThat(response).isNotNull();
         assertThat(response.getToken()).isEqualTo("jwt.token.here");
         assertThat(response.getUser()).isNotNull();
+        assertThat(response.getUser().getId()).isEqualTo(1L);
+        assertThat(response.getUser().getEmail()).isEqualTo("john.doe@example.com");
 
         verify(userRepository).existsByEmail("john.doe@example.com");
         verify(passwordHasher).hash("StrongPass123");
@@ -129,6 +141,16 @@ class RegisterUseCaseTest {
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
 
+        when(userResponseMapper.toResponse(any(User.class))).thenReturn(
+                com.synapse.money.application.dto.response.UserResponse.builder()
+                        .id(1L)
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("john.doe@example.com")
+                        .createdAt(savedUser.getCreatedAt())
+                        .build()
+        );
+
         registerUseCase.execute(requestWithUpperCaseEmail);
 
         verify(userRepository).existsByEmail("john.doe@example.com");
@@ -151,6 +173,16 @@ class RegisterUseCaseTest {
         when(passwordHasher.hash("StrongPass123")).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
+
+        when(userResponseMapper.toResponse(any(User.class))).thenReturn(
+                com.synapse.money.application.dto.response.UserResponse.builder()
+                        .id(1L)
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("john.doe@example.com")
+                        .createdAt(savedUser.getCreatedAt())
+                        .build()
+        );
 
         registerUseCase.execute(validRequest);
 
@@ -178,6 +210,16 @@ class RegisterUseCaseTest {
         when(userRepository.save(any(User.class))).thenReturn(savedUser);
         when(tokenGenerator.generate(savedUser)).thenReturn("generated.jwt.token");
 
+        when(userResponseMapper.toResponse(any(User.class))).thenReturn(
+                com.synapse.money.application.dto.response.UserResponse.builder()
+                        .id(1L)
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("john.doe@example.com")
+                        .createdAt(savedUser.getCreatedAt())
+                        .build()
+        );
+
         AuthResponse response = registerUseCase.execute(validRequest);
 
         assertThat(response.getToken()).isEqualTo("generated.jwt.token");
@@ -202,6 +244,16 @@ class RegisterUseCaseTest {
                     .build();
         });
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
+
+        when(userResponseMapper.toResponse(any(User.class))).thenReturn(
+                com.synapse.money.application.dto.response.UserResponse.builder()
+                        .id(1L)
+                        .firstName("John")
+                        .lastName("Doe")
+                        .email("john.doe@example.com")
+                        .createdAt(LocalDateTime.now())
+                        .build()
+        );
 
         registerUseCase.execute(validRequest);
 
