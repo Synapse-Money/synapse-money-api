@@ -1,5 +1,7 @@
 package com.synapse.money.infrastructure.security;
 
+import com.synapse.money.domain.entity.User;
+import com.synapse.money.domain.service.TokenGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public class JwtService implements TokenGenerator {
 
     private final String secret;
     private final long expiration;
@@ -29,6 +31,26 @@ public class JwtService {
         this.expiration = expiration;
     }
 
+    @Override
+    public String generate(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
+        if (user.getEmail() == null) {
+            throw new IllegalArgumentException("User email cannot be null");
+        }
+        if (user.getId() == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
+
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", user.getId());
+        extraClaims.put("firstName", user.getFirstName());
+        extraClaims.put("lastName", user.getLastName());
+
+        return generateTokenFromEmail(extraClaims, user.getEmail());
+    }
+
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
@@ -39,6 +61,18 @@ public class JwtService {
         return Jwts.builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
+    private String generateTokenFromEmail(
+            Map<String, Object> extraClaims,
+            String email) {
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(email)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())

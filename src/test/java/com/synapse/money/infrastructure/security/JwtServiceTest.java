@@ -13,8 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -205,5 +203,128 @@ class JwtServiceTest {
 
         assertThatThrownBy(() -> shortExpirationService.isTokenExpired(token))
                 .isInstanceOf(ExpiredJwtException.class);
+    }
+
+    @Test
+    @DisplayName("Should generate token from User entity")
+    void shouldGenerateTokenFromUserEntity() {
+        com.synapse.money.domain.entity.User user = com.synapse.money.domain.entity.User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .password("hashedPassword")
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        String token = jwtService.generate(user);
+
+        assertThat(token).isNotNull();
+        assertThat(token).isNotEmpty();
+        assertThat(token.split("\\.")).hasSize(3);
+    }
+
+    @Test
+    @DisplayName("Should include user email in token subject when generating from User")
+    void shouldIncludeUserEmailInTokenSubjectWhenGeneratingFromUser() {
+        com.synapse.money.domain.entity.User user = com.synapse.money.domain.entity.User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .password("hashedPassword")
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        String token          = jwtService.generate(user);
+        String extractedEmail = jwtService.extractUsername(token);
+
+        assertThat(extractedEmail).isEqualTo("john.doe@example.com");
+    }
+
+    @Test
+    @DisplayName("Should include user ID in token claims when generating from User")
+    void shouldIncludeUserIdInTokenClaimsWhenGeneratingFromUser() {
+        com.synapse.money.domain.entity.User user = com.synapse.money.domain.entity.User.builder()
+                .id(42L)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .password("hashedPassword")
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        String token           = jwtService.generate(user);
+        Long   extractedUserId = jwtService.extractClaim(token, claims -> claims.get("userId", Long.class));
+
+        assertThat(extractedUserId).isEqualTo(42L);
+    }
+
+    @Test
+    @DisplayName("Should throw exception when generating token from null user")
+    void shouldThrowExceptionWhenGeneratingTokenFromNullUser() {
+        assertThatThrownBy(() -> jwtService.generate(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User cannot be null");
+    }
+
+    @Test
+    @DisplayName("Should throw exception when user email is null")
+    void shouldThrowExceptionWhenUserEmailIsNull() {
+        com.synapse.money.domain.entity.User user = com.synapse.money.domain.entity.User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Doe")
+                .email(null)
+                .password("hashedPassword")
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        assertThatThrownBy(() -> jwtService.generate(user))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User email cannot be null");
+    }
+
+    @Test
+    @DisplayName("Should throw exception when user ID is null")
+    void shouldThrowExceptionWhenUserIdIsNull() {
+        com.synapse.money.domain.entity.User user = com.synapse.money.domain.entity.User.builder()
+                .id(null)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .password("hashedPassword")
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        assertThatThrownBy(() -> jwtService.generate(user))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("User ID cannot be null");
+    }
+
+    @Test
+    @DisplayName("Should include firstName and lastName in token claims")
+    void shouldIncludeFirstNameAndLastNameInTokenClaims() {
+        com.synapse.money.domain.entity.User user = com.synapse.money.domain.entity.User.builder()
+                .id(1L)
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .password("hashedPassword")
+                .createdAt(java.time.LocalDateTime.now())
+                .updatedAt(java.time.LocalDateTime.now())
+                .build();
+
+        String token     = jwtService.generate(user);
+        String firstName = jwtService.extractClaim(token, claims -> claims.get("firstName", String.class));
+        String lastName  = jwtService.extractClaim(token, claims -> claims.get("lastName", String.class));
+
+        assertThat(firstName).isEqualTo("John");
+        assertThat(lastName).isEqualTo("Doe");
     }
 }
