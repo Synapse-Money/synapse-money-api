@@ -1,4 +1,4 @@
-package com.synapse.money.domain.exception;
+package com.synapse.money.domain.service;
 
 import com.synapse.money.domain.entity.User;
 
