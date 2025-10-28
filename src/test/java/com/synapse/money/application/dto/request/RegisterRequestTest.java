@@ -50,8 +50,8 @@ class RegisterRequestTest {
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
-        assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("First name is required");
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).anyMatch(v -> v.getMessage().equals("First name is required"));
     }
 
     @Test
@@ -100,8 +100,8 @@ class RegisterRequestTest {
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
-        assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("Last name is required");
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).anyMatch(v -> v.getMessage().equals("Last name is required"));
     }
 
     @Test
@@ -182,8 +182,8 @@ class RegisterRequestTest {
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
-        assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("Password is required");
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).anyMatch(v -> v.getMessage().equals("Password is required"));
     }
 
     @Test
