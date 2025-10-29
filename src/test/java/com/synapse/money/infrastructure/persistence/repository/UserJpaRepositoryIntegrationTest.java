@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("UserJpaRepository Integration Tests")
-class UserJpaRepositoryTest {
+class UserJpaRepositoryIntegrationTest {
 
     private final UserJpaRepository userJpaRepository;
     private final TestEntityManager entityManager;
 
     @Autowired
-    UserJpaRepositoryTest(
+    UserJpaRepositoryIntegrationTest(
             UserJpaRepository userJpaRepository,
             TestEntityManager entityManager) {
         this.userJpaRepository = userJpaRepository;

@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DisplayName("SecurityConfig Tests")
-class SecurityConfigTest {
+class SecurityConfigIntegrationTest {
 
     private static final String REGISTER_ENDPOINT = "/api/v1/auth/register";
     private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
