@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,10 +33,11 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should save user entity successfully")
     void shouldSaveUserEntitySuccessfully() {
+        String email = generateUniqueEmail();
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -45,7 +47,7 @@ class UserJpaRepositoryTest {
 
         assertThat(savedUser).isNotNull();
         assertThat(savedUser.getId()).isNotNull();
-        assertThat(savedUser.getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(savedUser.getEmail()).isEqualTo(email);
         assertThat(savedUser.getFirstName()).isEqualTo("John");
         assertThat(savedUser.getLastName()).isEqualTo("Doe");
     }
@@ -53,10 +55,11 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should find user by email ignoring case")
     void shouldFindUserByEmailIgnoringCase() {
+        String email = generateUniqueEmail();
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -64,16 +67,16 @@ class UserJpaRepositoryTest {
 
         entityManager.persistAndFlush(user);
 
-        Optional<UserEntity> foundUser = userJpaRepository.findByEmailIgnoreCase("JOHN.DOE@EXAMPLE.COM");
+        Optional<UserEntity> foundUser = userJpaRepository.findByEmailIgnoreCase(email.toUpperCase());
 
         assertThat(foundUser).isPresent();
-        assertThat(foundUser.get().getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(foundUser.get().getEmail()).isEqualTo(email);
     }
 
     @Test
     @DisplayName("Should return empty when user not found by email")
     void shouldReturnEmptyWhenUserNotFoundByEmail() {
-        Optional<UserEntity> foundUser = userJpaRepository.findByEmailIgnoreCase("nonexistent@example.com");
+        Optional<UserEntity> foundUser = userJpaRepository.findByEmailIgnoreCase(generateUniqueEmail());
 
         assertThat(foundUser).isEmpty();
     }
@@ -81,10 +84,11 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should check if email exists ignoring case")
     void shouldCheckIfEmailExistsIgnoringCase() {
+        String email = generateUniqueEmail();
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -92,7 +96,7 @@ class UserJpaRepositoryTest {
 
         entityManager.persistAndFlush(user);
 
-        boolean exists = userJpaRepository.existsByEmailIgnoreCase("JOHN.DOE@EXAMPLE.COM");
+        boolean exists = userJpaRepository.existsByEmailIgnoreCase(email.toUpperCase());
 
         assertThat(exists).isTrue();
     }
@@ -100,7 +104,7 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should return false when email does not exist")
     void shouldReturnFalseWhenEmailDoesNotExist() {
-        boolean exists = userJpaRepository.existsByEmailIgnoreCase("nonexistent@example.com");
+        boolean exists = userJpaRepository.existsByEmailIgnoreCase(generateUniqueEmail());
 
         assertThat(exists).isFalse();
     }
@@ -108,10 +112,11 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should find user by exact email")
     void shouldFindUserByExactEmail() {
+        String email = generateUniqueEmail();
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -119,7 +124,7 @@ class UserJpaRepositoryTest {
 
         entityManager.persistAndFlush(user);
 
-        Optional<UserEntity> foundUser = userJpaRepository.findByEmailIgnoreCase("john.doe@example.com");
+        Optional<UserEntity> foundUser = userJpaRepository.findByEmailIgnoreCase(email);
 
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getId()).isEqualTo(user.getId());
@@ -128,10 +133,11 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should update user successfully")
     void shouldUpdateUserSuccessfully() {
+        String email = generateUniqueEmail();
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -151,10 +157,11 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should find user by id")
     void shouldFindUserById() {
+        String email = generateUniqueEmail();
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
@@ -166,7 +173,7 @@ class UserJpaRepositoryTest {
 
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getId()).isEqualTo(savedUser.getId());
-        assertThat(foundUser.get().getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(foundUser.get().getEmail()).isEqualTo(email);
     }
 
     @Test
@@ -180,12 +187,13 @@ class UserJpaRepositoryTest {
     @Test
     @DisplayName("Should persist timestamps correctly")
     void shouldPersistTimestampsCorrectly() {
-        LocalDateTime now = LocalDateTime.now();
+        String        email = generateUniqueEmail();
+        LocalDateTime now   = LocalDateTime.now();
 
         UserEntity user = UserEntity.builder()
                 .firstName("John")
                 .lastName("Doe")
-                .email("john.doe@example.com")
+                .email(email)
                 .password("hashedPassword123")
                 .createdAt(now)
                 .updatedAt(now)
@@ -197,5 +205,9 @@ class UserJpaRepositoryTest {
         assertThat(savedUser.getUpdatedAt()).isNotNull();
         assertThat(savedUser.getCreatedAt()).isEqualToIgnoringNanos(now);
         assertThat(savedUser.getUpdatedAt()).isEqualToIgnoringNanos(now);
+    }
+
+    private String generateUniqueEmail() {
+        return "user-" + UUID.randomUUID() + "@example.com";
     }
 }
