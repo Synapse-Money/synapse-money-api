@@ -2,6 +2,7 @@ package com.synapse.money.application.usecase;
 
 import com.synapse.money.application.dto.request.RegisterRequest;
 import com.synapse.money.application.dto.response.AuthResponse;
+import com.synapse.money.application.dto.response.UserResponse;
 import com.synapse.money.application.mapper.UserResponseMapper;
 import com.synapse.money.domain.entity.User;
 import com.synapse.money.domain.exception.EmailAlreadyExistsException;
@@ -50,12 +51,12 @@ class RegisterUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        validRequest = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("StrongPass123")
-                .build();
+        validRequest = new RegisterRequest(
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                "StrongPass123"
+        );
     }
 
     @Test
@@ -77,22 +78,22 @@ class RegisterUseCaseTest {
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
 
         when(userResponseMapper.toResponse(any(User.class))).thenReturn(
-                com.synapse.money.application.dto.response.UserResponse.builder()
-                        .id(1L)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .email("john.doe@example.com")
-                        .createdAt(savedUser.getCreatedAt())
-                        .build()
+                new UserResponse(
+                        1L,
+                        "John",
+                        "Doe",
+                        "john.doe@example.com",
+                        savedUser.getCreatedAt()
+                )
         );
 
         AuthResponse response = registerUseCase.execute(validRequest);
 
         assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo("jwt.token.here");
-        assertThat(response.getUser()).isNotNull();
-        assertThat(response.getUser().getId()).isEqualTo(1L);
-        assertThat(response.getUser().getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(response.token()).isEqualTo("jwt.token.here");
+        assertThat(response.user()).isNotNull();
+        assertThat(response.user().id()).isEqualTo(1L);
+        assertThat(response.user().email()).isEqualTo("john.doe@example.com");
 
         verify(userRepository).existsByEmail("john.doe@example.com");
         verify(passwordHasher).hash("StrongPass123");
@@ -119,12 +120,12 @@ class RegisterUseCaseTest {
     @Test
     @DisplayName("Should normalize email before checking existence")
     void shouldNormalizeEmailBeforeCheckingExistence() {
-        RegisterRequest requestWithUpperCaseEmail = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("JOHN.DOE@EXAMPLE.COM")
-                .password("StrongPass123")
-                .build();
+        RegisterRequest requestWithUpperCaseEmail = new RegisterRequest(
+                "John",
+                "Doe",
+                "JOHN.DOE@EXAMPLE.COM",
+                "StrongPass123"
+        );
 
         User savedUser = User.builder()
                 .id(1L)
@@ -142,13 +143,13 @@ class RegisterUseCaseTest {
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
 
         when(userResponseMapper.toResponse(any(User.class))).thenReturn(
-                com.synapse.money.application.dto.response.UserResponse.builder()
-                        .id(1L)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .email("john.doe@example.com")
-                        .createdAt(savedUser.getCreatedAt())
-                        .build()
+                new UserResponse(
+                        1L,
+                        "John",
+                        "Doe",
+                        "john.doe@example.com",
+                        savedUser.getCreatedAt()
+                )
         );
 
         registerUseCase.execute(requestWithUpperCaseEmail);
@@ -175,13 +176,13 @@ class RegisterUseCaseTest {
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
 
         when(userResponseMapper.toResponse(any(User.class))).thenReturn(
-                com.synapse.money.application.dto.response.UserResponse.builder()
-                        .id(1L)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .email("john.doe@example.com")
-                        .createdAt(savedUser.getCreatedAt())
-                        .build()
+                new UserResponse(
+                        1L,
+                        "John",
+                        "Doe",
+                        "john.doe@example.com",
+                        savedUser.getCreatedAt()
+                )
         );
 
         registerUseCase.execute(validRequest);
@@ -211,18 +212,18 @@ class RegisterUseCaseTest {
         when(tokenGenerator.generate(savedUser)).thenReturn("generated.jwt.token");
 
         when(userResponseMapper.toResponse(any(User.class))).thenReturn(
-                com.synapse.money.application.dto.response.UserResponse.builder()
-                        .id(1L)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .email("john.doe@example.com")
-                        .createdAt(savedUser.getCreatedAt())
-                        .build()
+                new UserResponse(
+                        1L,
+                        "John",
+                        "Doe",
+                        "john.doe@example.com",
+                        savedUser.getCreatedAt()
+                )
         );
 
         AuthResponse response = registerUseCase.execute(validRequest);
 
-        assertThat(response.getToken()).isEqualTo("generated.jwt.token");
+        assertThat(response.token()).isEqualTo("generated.jwt.token");
         verify(tokenGenerator).generate(savedUser);
     }
 
@@ -246,13 +247,14 @@ class RegisterUseCaseTest {
         when(tokenGenerator.generate(any(User.class))).thenReturn("jwt.token.here");
 
         when(userResponseMapper.toResponse(any(User.class))).thenReturn(
-                com.synapse.money.application.dto.response.UserResponse.builder()
-                        .id(1L)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .email("john.doe@example.com")
-                        .createdAt(LocalDateTime.now())
-                        .build()
+                new UserResponse(
+                        1L,
+                        "John",
+                        "Doe",
+                        "john.doe@example.com",
+                        LocalDateTime.now()
+
+                )
         );
 
         registerUseCase.execute(validRequest);

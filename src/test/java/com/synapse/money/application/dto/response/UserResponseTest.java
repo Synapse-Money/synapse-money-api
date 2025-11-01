@@ -19,32 +19,32 @@ class UserResponseTest {
         String        email     = "john.doe@example.com";
         LocalDateTime createdAt = LocalDateTime.now();
 
-        UserResponse response = UserResponse.builder()
-                .id(id)
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .createdAt(createdAt)
-                .build();
+        UserResponse response = new UserResponse(
+                id,
+                firstName,
+                lastName,
+                email,
+                createdAt
+        );
 
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(id);
-        assertThat(response.getFirstName()).isEqualTo(firstName);
-        assertThat(response.getLastName()).isEqualTo(lastName);
-        assertThat(response.getEmail()).isEqualTo(email);
-        assertThat(response.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(response.id()).isEqualTo(id);
+        assertThat(response.firstName()).isEqualTo(firstName);
+        assertThat(response.lastName()).isEqualTo(lastName);
+        assertThat(response.email()).isEqualTo(email);
+        assertThat(response.createdAt()).isEqualTo(createdAt);
     }
 
     @Test
     @DisplayName("Should not have updatedAt field")
     void shouldNotHaveUpdatedAtField() {
-        UserResponse response = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(LocalDateTime.now())
-                .build();
+        UserResponse response = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                LocalDateTime.now()
+        );
 
         assertThat(response.toString()).doesNotContain("updatedAt");
     }
@@ -52,13 +52,13 @@ class UserResponseTest {
     @Test
     @DisplayName("Should not have password field")
     void shouldNotHavePasswordField() {
-        UserResponse response = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(LocalDateTime.now())
-                .build();
+        UserResponse response = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                LocalDateTime.now()
+        );
 
         assertThat(response.toString()).doesNotContain("password");
     }
@@ -66,15 +66,15 @@ class UserResponseTest {
     @Test
     @DisplayName("Should handle null createdAt")
     void shouldHandleNullCreatedAt() {
-        UserResponse response = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(null)
-                .build();
+        UserResponse response = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                null
+        );
 
-        assertThat(response.getCreatedAt()).isNull();
+        assertThat(response.createdAt()).isNull();
     }
 
     @Test
@@ -82,21 +82,21 @@ class UserResponseTest {
     void shouldBeEqualWhenAllFieldsMatch() {
         LocalDateTime now = LocalDateTime.now();
 
-        UserResponse response1 = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(now)
-                .build();
+        UserResponse response1 = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                now
+        );
 
-        UserResponse response2 = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(now)
-                .build();
+        UserResponse response2 = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                now
+        );
 
         assertThat(response1).isEqualTo(response2);
         assertThat(response1.hashCode()).isEqualTo(response2.hashCode());
@@ -105,23 +105,21 @@ class UserResponseTest {
     @Test
     @DisplayName("Should not be equal when ids differ")
     void shouldNotBeEqualWhenIdsDiffer() {
-        LocalDateTime now = LocalDateTime.now();
+        UserResponse response1 = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                LocalDateTime.now()
+        );
 
-        UserResponse response1 = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(now)
-                .build();
-
-        UserResponse response2 = UserResponse.builder()
-                .id(2L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(now)
-                .build();
+        UserResponse response2 = new UserResponse(
+                2L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                LocalDateTime.now()
+        );
 
         assertThat(response1).isNotEqualTo(response2);
     }

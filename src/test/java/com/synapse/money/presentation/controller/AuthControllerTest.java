@@ -77,18 +77,18 @@ class AuthControllerTest {
                 VALID_PASSWORD
         );
 
-        UserResponse userResponse = UserResponse.builder()
-                .id(USER_ID)
-                .firstName(VALID_FIRST_NAME)
-                .lastName(VALID_LAST_NAME)
-                .email(VALID_EMAIL)
-                .createdAt(LocalDateTime.now())
-                .build();
+        UserResponse userResponse = new UserResponse(
+                USER_ID,
+                VALID_FIRST_NAME,
+                VALID_LAST_NAME,
+                VALID_EMAIL,
+                LocalDateTime.now()
+        );
 
-        AuthResponse successfulAuthResponse = AuthResponse.builder()
-                .token(VALID_JWT_TOKEN)
-                .user(userResponse)
-                .build();
+        AuthResponse successfulAuthResponse = new AuthResponse(
+                VALID_JWT_TOKEN,
+                userResponse
+        );
 
         when(registerUseCase.execute(any(RegisterRequest.class))).thenReturn(successfulAuthResponse);
 
@@ -145,18 +145,18 @@ class AuthControllerTest {
                 VALID_PASSWORD
         );
 
-        UserResponse userResponse = UserResponse.builder()
-                .id(USER_ID)
-                .firstName(VALID_FIRST_NAME)
-                .lastName(VALID_LAST_NAME)
-                .email(VALID_EMAIL)
-                .createdAt(LocalDateTime.now())
-                .build();
+        UserResponse userResponse = new UserResponse(
+                USER_ID,
+                VALID_FIRST_NAME,
+                VALID_LAST_NAME,
+                VALID_EMAIL,
+                LocalDateTime.now()
+        );
 
-        AuthResponse successfulAuthResponse = AuthResponse.builder()
-                .token(VALID_JWT_TOKEN)
-                .user(userResponse)
-                .build();
+        AuthResponse successfulAuthResponse = new AuthResponse(
+                VALID_JWT_TOKEN,
+                userResponse
+        );
 
         when(loginUseCase.execute(any(LoginRequest.class))).thenReturn(successfulAuthResponse);
 

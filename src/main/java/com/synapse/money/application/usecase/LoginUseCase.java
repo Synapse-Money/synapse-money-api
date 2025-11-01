@@ -23,20 +23,20 @@ public class LoginUseCase {
 
     @Transactional(readOnly = true)
     public AuthResponse execute(LoginRequest request) {
-        String normalizedEmail = request.getEmail().toLowerCase();
+        String normalizedEmail = request.email().toLowerCase();
 
         User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
 
-        if (!passwordHasher.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordHasher.matches(request.password(), user.getPassword())) {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
         String token = tokenGenerator.generate(user);
 
-        return AuthResponse.builder()
-                .token(token)
-                .user(userResponseMapper.toResponse(user))
-                .build();
+        return new AuthResponse(
+                token,
+                userResponseMapper.toResponse(user)
+        );
     }
 }

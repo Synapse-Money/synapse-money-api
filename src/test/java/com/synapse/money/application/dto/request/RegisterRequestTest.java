@@ -26,12 +26,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should create valid RegisterRequest")
     void shouldCreateValidRegisterRequest() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -41,12 +41,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when firstName is blank")
     void shouldFailWhenFirstNameIsBlank() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "",
+                "Doe",
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -57,12 +57,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when firstName is too short")
     void shouldFailWhenFirstNameIsTooShort() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("J")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "J",
+                "Doe",
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -74,12 +74,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when firstName is too long")
     void shouldFailWhenFirstNameIsTooLong() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("a".repeat(51))
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "a".repeat(51),
+                "Doe",
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -91,12 +91,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when lastName is blank")
     void shouldFailWhenLastNameIsBlank() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("")
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "",
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -107,12 +107,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when lastName is too short")
     void shouldFailWhenLastNameIsTooShort() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("D")
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "D",
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -124,12 +124,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when lastName is too long")
     void shouldFailWhenLastNameIsTooLong() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("a".repeat(51))
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "a".repeat(51),
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -141,12 +141,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when email is blank")
     void shouldFailWhenEmailIsBlank() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "Doe",
+                "",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -157,12 +157,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when email is invalid")
     void shouldFailWhenEmailIsInvalid() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("invalid-email")
-                .password("securePassword123")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "Doe",
+                "invalid-email",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -173,12 +173,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when password is blank")
     void shouldFailWhenPasswordIsBlank() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                ""
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -189,12 +189,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when password is too short")
     void shouldFailWhenPasswordIsTooShort() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("short")
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                "short"
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 
@@ -206,12 +206,12 @@ class RegisterRequestTest {
     @Test
     @DisplayName("Should fail when password is too long")
     void shouldFailWhenPasswordIsTooLong() {
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .password("a".repeat(101))
-                .build();
+        RegisterRequest request = new RegisterRequest(
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                "a".repeat(101)
+        );
 
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
 

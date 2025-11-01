@@ -40,11 +40,11 @@ class UserResponseMapperTest {
         UserResponse response = mapper.toResponse(user);
 
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getFirstName()).isEqualTo("John");
-        assertThat(response.getLastName()).isEqualTo("Doe");
-        assertThat(response.getEmail()).isEqualTo("john.doe@example.com");
-        assertThat(response.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(response.id()).isEqualTo(1L);
+        assertThat(response.firstName()).isEqualTo("John");
+        assertThat(response.lastName()).isEqualTo("Doe");
+        assertThat(response.email()).isEqualTo("john.doe@example.com");
+        assertThat(response.createdAt()).isEqualTo(createdAt);
     }
 
     @Test
@@ -85,7 +85,7 @@ class UserResponseMapperTest {
         UserResponse response = mapper.toResponse(user);
 
         assertThat(response.toString()).doesNotContain("updatedAt");
-        assertThat(response.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(response.createdAt()).isEqualTo(createdAt);
     }
 
     @Test
@@ -112,7 +112,7 @@ class UserResponseMapperTest {
         UserResponse response = mapper.toResponse(user);
 
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isNull();
+        assertThat(response.id()).isNull();
     }
 
     @Test
@@ -131,7 +131,7 @@ class UserResponseMapperTest {
         UserResponse response = mapper.toResponse(user);
 
         assertThat(response).isNotNull();
-        assertThat(response.getCreatedAt()).isNull();
+        assertThat(response.createdAt()).isNull();
     }
 
     @Test
@@ -160,9 +160,9 @@ class UserResponseMapperTest {
         UserResponse response1 = mapper.toResponse(user1);
         UserResponse response2 = mapper.toResponse(user2);
 
-        assertThat(response1.getId()).isEqualTo(1L);
-        assertThat(response1.getFirstName()).isEqualTo("John");
-        assertThat(response2.getId()).isEqualTo(2L);
-        assertThat(response2.getFirstName()).isEqualTo("Jane");
+        assertThat(response1.id()).isEqualTo(1L);
+        assertThat(response1.firstName()).isEqualTo("John");
+        assertThat(response2.id()).isEqualTo(2L);
+        assertThat(response2.firstName()).isEqualTo("Jane");
     }
 }

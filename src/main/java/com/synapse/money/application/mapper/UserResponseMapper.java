@@ -12,12 +12,12 @@ public class UserResponseMapper {
             throw new IllegalArgumentException("User cannot be null");
         }
 
-        return UserResponse.builder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .createdAt(user.getCreatedAt())
-                .build();
+        return new UserResponse(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getCreatedAt()
+        );
     }
 }

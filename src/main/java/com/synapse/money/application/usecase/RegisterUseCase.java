@@ -25,18 +25,18 @@ public class RegisterUseCase {
 
     @Transactional
     public AuthResponse execute(RegisterRequest request) {
-        String normalizedEmail = request.getEmail().toLowerCase();
+        String normalizedEmail = request.email().toLowerCase();
 
         if (userRepository.existsByEmail(normalizedEmail)) {
             throw new EmailAlreadyExistsException("Email already exists: " + normalizedEmail);
         }
 
-        String hashedPassword = passwordHasher.hash(request.getPassword());
+        String hashedPassword = passwordHasher.hash(request.password());
 
         LocalDateTime now = LocalDateTime.now();
         User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
                 .email(normalizedEmail)
                 .password(hashedPassword)
                 .createdAt(now)
@@ -47,9 +47,9 @@ public class RegisterUseCase {
 
         String token = tokenGenerator.generate(savedUser);
 
-        return AuthResponse.builder()
-                .token(token)
-                .user(userResponseMapper.toResponse(savedUser))
-                .build();
+        return new AuthResponse(
+                token,
+                userResponseMapper.toResponse(savedUser)
+        );
     }
 }

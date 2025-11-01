@@ -53,10 +53,10 @@ class LoginUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        validRequest = LoginRequest.builder()
-                .email("john.doe@example.com")
-                .password("StrongPass123")
-                .build();
+        validRequest = new LoginRequest(
+                "john.doe@example.com",
+                "StrongPass123"
+        );
 
         existingUser = User.builder()
                 .id(1L)
@@ -68,13 +68,13 @@ class LoginUseCaseTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        userResponse = UserResponse.builder()
-                .id(1L)
-                .firstName("John")
-                .lastName("Doe")
-                .email("john.doe@example.com")
-                .createdAt(existingUser.getCreatedAt())
-                .build();
+        userResponse = new UserResponse(
+                1L,
+                "John",
+                "Doe",
+                "john.doe@example.com",
+                existingUser.getCreatedAt()
+        );
     }
 
     @Test
@@ -88,10 +88,10 @@ class LoginUseCaseTest {
         AuthResponse response = loginUseCase.execute(validRequest);
 
         assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo("jwt.token.here");
-        assertThat(response.getUser()).isNotNull();
-        assertThat(response.getUser().getId()).isEqualTo(1L);
-        assertThat(response.getUser().getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(response.token()).isEqualTo("jwt.token.here");
+        assertThat(response.user()).isNotNull();
+        assertThat(response.user().id()).isEqualTo(1L);
+        assertThat(response.user().email()).isEqualTo("john.doe@example.com");
 
         verify(userRepository).findByEmail("john.doe@example.com");
         verify(passwordHasher).matches("StrongPass123", "$2a$10$hashedPassword");
@@ -131,10 +131,10 @@ class LoginUseCaseTest {
     @Test
     @DisplayName("Should normalize email before searching")
     void shouldNormalizeEmailBeforeSearching() {
-        LoginRequest requestWithUpperCaseEmail = LoginRequest.builder()
-                .email("JOHN.DOE@EXAMPLE.COM")
-                .password("StrongPass123")
-                .build();
+        LoginRequest requestWithUpperCaseEmail = new LoginRequest(
+                "JOHN.DOE@EXAMPLE.COM",
+                "StrongPass123"
+        );
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(existingUser));
         when(passwordHasher.matches(anyString(), anyString())).thenReturn(true);
@@ -156,7 +156,7 @@ class LoginUseCaseTest {
 
         AuthResponse response = loginUseCase.execute(validRequest);
 
-        assertThat(response.getToken()).isEqualTo("generated.jwt.token");
+        assertThat(response.token()).isEqualTo("generated.jwt.token");
         verify(tokenGenerator).generate(existingUser);
     }
 
@@ -183,11 +183,11 @@ class LoginUseCaseTest {
 
         AuthResponse response = loginUseCase.execute(validRequest);
 
-        assertThat(response.getUser()).isNotNull();
-        assertThat(response.getUser().getId()).isEqualTo(1L);
-        assertThat(response.getUser().getFirstName()).isEqualTo("John");
-        assertThat(response.getUser().getLastName()).isEqualTo("Doe");
-        assertThat(response.getUser().getEmail()).isEqualTo("john.doe@example.com");
+        assertThat(response.user()).isNotNull();
+        assertThat(response.user().id()).isEqualTo(1L);
+        assertThat(response.user().firstName()).isEqualTo("John");
+        assertThat(response.user().lastName()).isEqualTo("Doe");
+        assertThat(response.user().email()).isEqualTo("john.doe@example.com");
 
         verify(userResponseMapper).toResponse(existingUser);
     }

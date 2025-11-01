@@ -26,10 +26,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should create valid LoginRequest")
     void shouldCreateValidLoginRequest() {
-        LoginRequest request = LoginRequest.builder()
-                .email("john.doe@example.com")
-                .password("securePassword123")
-                .build();
+        LoginRequest request = new LoginRequest(
+                "john.doe@example.com",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
@@ -39,10 +39,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should fail when email is blank")
     void shouldFailWhenEmailIsBlank() {
-        LoginRequest request = LoginRequest.builder()
-                .email("")
-                .password("securePassword123")
-                .build();
+        LoginRequest request = new LoginRequest(
+                "",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
@@ -53,10 +53,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should fail when email is null")
     void shouldFailWhenEmailIsNull() {
-        LoginRequest request = LoginRequest.builder()
-                .email(null)
-                .password("securePassword123")
-                .build();
+        LoginRequest request = new LoginRequest(
+                null,
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
@@ -67,10 +67,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should fail when email is invalid")
     void shouldFailWhenEmailIsInvalid() {
-        LoginRequest request = LoginRequest.builder()
-                .email("invalid-email")
-                .password("securePassword123")
-                .build();
+        LoginRequest request = new LoginRequest(
+                "invalid-email",
+                "securePassword123"
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
@@ -81,10 +81,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should fail when password is blank")
     void shouldFailWhenPasswordIsBlank() {
-        LoginRequest request = LoginRequest.builder()
-                .email("john.doe@example.com")
-                .password("")
-                .build();
+        LoginRequest request = new LoginRequest(
+                "john.doe@example.com",
+                ""
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
@@ -95,10 +95,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should fail when password is null")
     void shouldFailWhenPasswordIsNull() {
-        LoginRequest request = LoginRequest.builder()
-                .email("john.doe@example.com")
-                .password(null)
-                .build();
+        LoginRequest request = new LoginRequest(
+                "john.doe@example.com",
+                null
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
@@ -109,10 +109,10 @@ class LoginRequestTest {
     @Test
     @DisplayName("Should fail when both email and password are blank")
     void shouldFailWhenBothEmailAndPasswordAreBlank() {
-        LoginRequest request = LoginRequest.builder()
-                .email("")
-                .password("")
-                .build();
+        LoginRequest request = new LoginRequest(
+                "",
+                ""
+        );
 
         Set<ConstraintViolation<LoginRequest>> violations = validator.validate(request);
 
