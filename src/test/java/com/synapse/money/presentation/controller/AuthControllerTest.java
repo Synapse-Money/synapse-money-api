@@ -102,8 +102,8 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/v1/auth/register - Should return 400 when email already exists")
-    void shouldReturn400WhenEmailAlreadyExists() throws Exception {
+    @DisplayName("POST /api/v1/auth/register - Should return 409 when email already exists")
+    void shouldReturn409WhenEmailAlreadyExists() throws Exception {
         RegisterRequest duplicateEmailRequest = new RegisterRequest(
                 VALID_FIRST_NAME,
                 VALID_LAST_NAME,
@@ -117,7 +117,7 @@ class AuthControllerTest {
         mockMvc.perform(post(REGISTER_ENDPOINT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicateEmailRequest)))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").exists());
     }
 

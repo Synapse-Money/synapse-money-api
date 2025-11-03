@@ -2,6 +2,8 @@ package com.synapse.money.presentation.exception;
 
 import com.synapse.money.domain.exception.EmailAlreadyExistsException;
 import com.synapse.money.domain.exception.InvalidCredentialsException;
+import com.synapse.money.presentation.dto.ErrorResponse;
+import com.synapse.money.presentation.dto.ValidationErrorResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -31,16 +33,16 @@ class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler exceptionHandler = new GlobalExceptionHandler();
 
     @Test
-    @DisplayName("Should handle EmailAlreadyExistsException and return 400")
+    @DisplayName("Should handle EmailAlreadyExistsException and return 409")
     void shouldHandleEmailAlreadyExistsException() {
         EmailAlreadyExistsException exception = new EmailAlreadyExistsException(EXISTING_EMAIL);
 
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+        ResponseEntity<ErrorResponse> response =
                 exceptionHandler.handleEmailAlreadyExists(exception);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().status()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.getBody().status()).isEqualTo(HttpStatus.CONFLICT.value());
         assertThat(response.getBody().message()).contains(EXISTING_EMAIL);
         assertThat(response.getBody().timestamp()).isNotNull();
     }
@@ -50,7 +52,7 @@ class GlobalExceptionHandlerTest {
     void shouldHandleInvalidCredentialsException() {
         InvalidCredentialsException exception = new InvalidCredentialsException(INVALID_CREDENTIALS_MESSAGE);
 
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+        ResponseEntity<ErrorResponse> response =
                 exceptionHandler.handleInvalidCredentials(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -71,7 +73,7 @@ class GlobalExceptionHandlerTest {
 
         when(bindingResult.getAllErrors()).thenReturn(List.of(emailError, passwordError));
 
-        ResponseEntity<GlobalExceptionHandler.ValidationErrorResponse> response =
+        ResponseEntity<ValidationErrorResponse> response =
                 exceptionHandler.handleValidationErrors(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
@@ -89,7 +91,7 @@ class GlobalExceptionHandlerTest {
     void shouldHandleGenericException() {
         Exception exception = new RuntimeException("Unexpected error");
 
-        ResponseEntity<GlobalExceptionHandler.ErrorResponse> response =
+        ResponseEntity<ErrorResponse> response =
                 exceptionHandler.handleGenericException(exception);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
