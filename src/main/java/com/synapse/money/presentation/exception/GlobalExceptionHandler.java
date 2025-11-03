@@ -2,6 +2,8 @@ package com.synapse.money.presentation.exception;
 
 import com.synapse.money.domain.exception.EmailAlreadyExistsException;
 import com.synapse.money.domain.exception.InvalidCredentialsException;
+import com.synapse.money.presentation.dto.ErrorResponse;
+import com.synapse.money.presentation.dto.ValidationErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -63,17 +65,4 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
-
-    public record ErrorResponse(
-            int status,
-            String message,
-            LocalDateTime timestamp
-    ) {}
-
-    public record ValidationErrorResponse(
-            int status,
-            String message,
-            Map<String, String> errors,
-            LocalDateTime timestamp
-    ) {}
 }
