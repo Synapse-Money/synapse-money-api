@@ -10,8 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,6 +24,7 @@ public class CategoryRepositoryTest {
     CategoryRepository categoryRepository;
 
     @Test
+    @DisplayName("Should save category successfully")
     void shouldSaveCategorySuccessfully() {
         Category category = makeSut();
 
@@ -33,8 +36,26 @@ public class CategoryRepositoryTest {
         assertThat(categorySaved.getId()).isNotNull();
     }
 
+    @Test
+    @DisplayName("Should not save category without user")
+    void shouldNotSaveCategoryWithoutUser() {
+        Category category = makeSut(builder -> builder.user(null));
+
+        when(categoryRepository.save(argThat(cat -> cat != null && cat.getUser() == null)))
+                .thenReturn(null);
+
+        Category categorySaved = categoryRepository.save(category);
+
+        assertThat(categorySaved).isNull();
+    }
+
+
     private Category makeSut() {
-        return Category.builder()
+        return makeSut(builder -> {});
+    }
+
+    private Category makeSut(Consumer<Category.CategoryBuilder> consumer) {
+        Category.CategoryBuilder builder = Category.builder()
                 .id(1L)
                 .user(makeUser())
                 .name("Test Category")
@@ -43,8 +64,10 @@ public class CategoryRepositoryTest {
                 .transactionType(ETransactionType.INCOME)
                 .isDefault(true)
                 .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+                .updatedAt(LocalDateTime.now());
+
+        consumer.accept(builder);
+        return builder.build();
     }
 
     private User makeUser() {
