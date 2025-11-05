@@ -39,7 +39,7 @@ public class CategoryRepositoryTest {
                 .updatedAt(LocalDateTime.now())
                 .build();
 
-        Category categorySaved = category.save(category);
+        Category categorySaved = categoryRepository.save(category);
 
         assertThat(categorySaved).isNotNull();
         assertThat(categorySaved.getId()).isNotNull();
