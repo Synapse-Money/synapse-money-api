@@ -23,19 +23,20 @@ public class CategoryRepositoryTest {
 
     @Test
     void shouldSaveCategorySuccessfully() {
-        User user = User.builder()
-                .id(1L)
-                .email("john.doe@example.com")
-                .password("hashedPassword123")
-                .firstName("John")
-                .lastName("Doe")
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        Category category = makeSut();
 
-        Category category = Category.builder()
+        when(categoryRepository.save(category)).thenReturn(category);
+
+        Category categorySaved = categoryRepository.save(category);
+
+        assertThat(categorySaved).isNotNull();
+        assertThat(categorySaved.getId()).isNotNull();
+    }
+
+    private Category makeSut() {
+        return Category.builder()
                 .id(1L)
-                .user(user)
+                .user(makeUser())
                 .name("Test Category")
                 .color("#333333")
                 .icon("Test Icon")
@@ -44,12 +45,17 @@ public class CategoryRepositoryTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
 
-        when(categoryRepository.save(category)).thenReturn(category);
-
-        Category categorySaved = categoryRepository.save(category);
-
-        assertThat(categorySaved).isNotNull();
-        assertThat(categorySaved.getId()).isNotNull();
+    private User makeUser() {
+        return User.builder()
+                .id(1L)
+                .email("john.doe@example.com")
+                .password("hashedPassword123")
+                .firstName("John")
+                .lastName("Doe")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
     }
 }
