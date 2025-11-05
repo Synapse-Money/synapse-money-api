@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Category {
     private Long id;
+    private User user;
     private String name;
     private String color;
     private String icon;
@@ -23,6 +24,9 @@ public class Category {
     private LocalDateTime updatedAt;
 
     public static boolean isValidColor(String color) {
-        return color.length() == 7;
+        if (color == null) {
+            return false;
+        }
+        return color.startsWith("#") && color.length() == 7;
     }
 }
