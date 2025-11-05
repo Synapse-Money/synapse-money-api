@@ -5,14 +5,20 @@ import com.synapse.money.domain.entity.User;
 import com.synapse.money.domain.enums.ETransactionType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Category Repository Tests")
 public class CategoryRepositoryTest {
 
+    @Mock
     CategoryRepository categoryRepository;
 
     @Test
@@ -38,6 +44,8 @@ public class CategoryRepositoryTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+
+        when(categoryRepository.save(category)).thenReturn(category);
 
         Category categorySaved = categoryRepository.save(category);
 
