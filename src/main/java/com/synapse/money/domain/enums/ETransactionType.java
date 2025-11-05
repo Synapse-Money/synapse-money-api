@@ -1,10 +1,11 @@
 package com.synapse.money.domain.enums;
 
 public enum ETransactionType {
-    EXPENSE("Expense"),
-    INCOME("Income");
+    EXPENSE("expense"),
+    TRANSFER("transfer"),
+    INCOME("income");
 
-    private String description;
+    private final String description;
 
     ETransactionType(String description) {
         this.description = description;
